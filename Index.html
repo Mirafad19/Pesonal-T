@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Real-Time Geolocation Tracker</title>
+    <title>Geolocation Demo</title>
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
@@ -22,7 +22,7 @@
         }
         
         .container {
-            max-width: 1400px;
+            max-width: 1200px;
             margin: 0 auto;
         }
         
@@ -111,16 +111,6 @@
             padding: 10px;
             border-radius: 5px;
             margin: 10px 0;
-        }
-        
-        .address-details {
-            background: rgba(0, 0, 0, 0.3);
-            padding: 15px;
-            border-radius: 5px;
-            margin: 15px 0;
-            font-size: 1rem;
-            min-height: 100px;
-            white-space: pre-wrap;
         }
         
         .accuracy-bar {
@@ -257,21 +247,6 @@
             opacity: 0.7;
         }
         
-        .loading {
-            display: inline-block;
-            width: 20px;
-            height: 20px;
-            border: 3px solid rgba(255,255,255,.3);
-            border-radius: 50%;
-            border-top-color: #fff;
-            animation: spin 1s ease-in-out infinite;
-            margin-left: 10px;
-        }
-        
-        @keyframes spin {
-            to { transform: rotate(360deg); }
-        }
-        
         @media (max-width: 768px) {
             .app-container {
                 flex-direction: column;
@@ -290,8 +265,8 @@
 <body>
     <div class="container">
         <header>
-            <h1><i class="fas fa-location-dot"></i> Real-Time Geolocation Tracker</h1>
-            <p class="subtitle">This tool automatically detects your location when you visit and shows your exact address on a detailed map.</p>
+            <h1><i class="fas fa-location-dot"></i> Geolocation Demo</h1>
+            <p class="subtitle">This demo shows how to use the HTML5 Geolocation API to get your location and display it on a map. Grant permission to see your position.</p>
         </header>
         
         <div class="app-container">
@@ -300,12 +275,12 @@
             </div>
             
             <div class="info-panel">
-                <h2 class="panel-title">Your Location Information</h2>
+                <h2 class="panel-title">Location Information</h2>
                 
                 <div class="status-card">
                     <h3 class="status-title"><i class="fas fa-user-check"></i> Permission Status</h3>
                     <div class="status-content" id="permission-status">
-                        Checking permissions...
+                        Not requested yet
                     </div>
                 </div>
                 
@@ -326,30 +301,21 @@
                 </div>
                 
                 <div class="status-card">
-                    <h3 class="status-title"><i class="fas fa-home"></i> Address Details</h3>
-                    <div class="status-content">
-                        <div class="address-details" id="address-details">
-                            Waiting for location data...
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="status-card">
                     <h3 class="status-title"><i class="fas fa-tachometer-alt"></i> Tracking Status</h3>
                     <div class="status-content" id="tracking-status">
-                        Auto-tracking active
+                        Not tracking
                     </div>
                 </div>
                 
                 <div class="controls">
-                    <button id="refresh-btn">
-                        <i class="fas fa-sync"></i> Refresh Location
+                    <button id="get-location-btn">
+                        <i class="fas fa-location-crosshairs"></i> Get Location
                     </button>
-                    <button id="start-tracking-btn" disabled>
-                        <i class="fas fa-play"></i> Resume Tracking
+                    <button id="start-tracking-btn">
+                        <i class="fas fa-play"></i> Start Tracking
                     </button>
-                    <button id="stop-tracking-btn">
-                        <i class="fas fa-stop"></i> Pause Tracking
+                    <button id="stop-tracking-btn" disabled class="stop-btn">
+                        <i class="fas fa-stop"></i> Stop Tracking
                     </button>
                 </div>
                 
@@ -363,47 +329,23 @@
         </div>
         
         <footer>
-            <p>Real-Time Geolocation Tracker | Works completely free with no API costs</p>
+            <p>Geolocation Demo using HTML5 Geolocation API and Leaflet.js | Created with â¤ï¸</p>
         </footer>
     </div>
     
     <div class="notification" id="notification"></div>
     
-    <script src="✓"></script>
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script>
-        // Initialize map with enhanced configuration
-        const map = L.map('map', {
-            zoomControl: true,
-            attributionControl: true,
-            maxZoom: 20
-        }).setView([0, 0], 2);
+        // Initialize map
+        const map = L.map('map').setView([0, 0], 2);
         
-        // Add high-quality tile layers
-        const osmLayer = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
-            maxZoom: 19
+        // Add tile layer
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
         }).addTo(map);
         
-        const humanitarianLayer = L.tileLayer('https://{s}.tile.openstreetmap.fr/hot/{z}/{x}/{y}.png', {
-            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, Tiles style by <a href="https://www.hotosm.org/" target="_blank">Humanitarian OpenStreetMap Team</a>',
-            maxZoom: 20
-        });
-        
-        const wikimediaLayer = L.tileLayer('https://maps.wikimedia.org/osm-intl/{z}/{x}/{y}{r}.png', {
-            attribution: '<a href="https://wikimediafoundation.org/wiki/Maps_Terms_of_Use">Wikimedia</a>',
-            maxZoom: 18
-        });
-        
-        // Add layer control
-        const baseLayers = {
-            "OpenStreetMap": osmLayer,
-            "Humanitarian": humanitarianLayer,
-            "Wikimedia": wikimediaLayer
-        };
-        
-        L.control.layers(baseLayers).addTo(map);
-        
-        // Create markers and circles
+        // Create a marker for the user's location
         let userMarker = null;
         let accuracyCircle = null;
         let trackingId = null;
@@ -415,13 +357,12 @@
         const accuracyEl = document.getElementById('accuracy');
         const timestampEl = document.getElementById('timestamp');
         const trackingStatusEl = document.getElementById('tracking-status');
-        const refreshBtn = document.getElementById('refresh-btn');
+        const getLocationBtn = document.getElementById('get-location-btn');
         const startTrackingBtn = document.getElementById('start-tracking-btn');
         const stopTrackingBtn = document.getElementById('stop-tracking-btn');
         const accuracyFillEl = document.getElementById('accuracy-fill');
         const historyListEl = document.getElementById('history-list');
         const notificationEl = document.getElementById('notification');
-        const addressDetailsEl = document.getElementById('address-details');
         
         // Show notification
         function showNotification(message, type = 'info') {
@@ -433,62 +374,8 @@
             }, 3000);
         }
         
-        // Enhanced reverse geocoding function
-        async function getAddressFromCoordinates(lat, lon) {
-            try {
-                // Try multiple geocoding services for better results
-                const urls = [
-                    `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lon}&addressdetails=1&zoom=18`,
-                    `https://geocode.arcgis.com/arcgis/rest/services/World/GeocodeServer/reverseGeocode?f=json&featureTypes=&location=${lon},${lat}`
-                ];
-                
-                // Try OpenStreetMap Nominatim first
-                const response1 = await fetch(urls[0]);
-                const data1 = await response1.json();
-                
-                if (data1 && data1.address) {
-                    const address = data1.address;
-                    let fullAddress = '';
-                    
-                    // Build detailed address string
-                    if (address.house_number) fullAddress += address.house_number + ' ';
-                    if (address.road) fullAddress += address.road + '\n';
-                    if (address.neighbourhood) fullAddress += address.neighbourhood + '\n';
-                    if (address.suburb) fullAddress += address.suburb + '\n';
-                    if (address.city) fullAddress += address.city + ', ';
-                    else if (address.town) fullAddress += address.town + ', ';
-                    else if (address.village) fullAddress += address.village + ', ';
-                    if (address.state) fullAddress += address.state + ' ';
-                    if (address.postcode) fullAddress += address.postcode + '\n';
-                    if (address.country) fullAddress += address.country;
-                    
-                    return {
-                        full: fullAddress || 'Address not found',
-                        components: address
-                    };
-                }
-                
-                // Fallback to ArcGIS if OSM fails
-                const response2 = await fetch(urls[1]);
-                const data2 = await response2.json();
-                
-                if (data2 && data2.address) {
-                    const address = data2.address;
-                    return {
-                        full: `${address.Match_addr}\n${address.LongLabel}`,
-                        components: address
-                    };
-                }
-                
-                return { full: 'Address not found', components: {} };
-            } catch (error) {
-                console.error('Geocoding error:', error);
-                return { full: 'Error retrieving address', components: {} };
-            }
-        }
-        
         // Update location information
-        async function updateLocationInfo(position) {
+        function updateLocationInfo(position) {
             const { latitude, longitude } = position.coords;
             const accuracy = position.coords.accuracy;
             const timestamp = new Date(position.timestamp).toLocaleString();
@@ -502,13 +389,6 @@
             const accuracyPercentage = Math.min(100, accuracy);
             accuracyFillEl.style.width = `${100 - accuracyPercentage}%`;
             
-            // Show loading indicator for address
-            addressDetailsEl.innerHTML = 'Resolving address... <span class="loading"></span>';
-            
-            // Get address details
-            const addressData = await getAddressFromCoordinates(latitude, longitude);
-            addressDetailsEl.textContent = addressData.full;
-            
             // Update map
             if (userMarker) {
                 userMarker.setLatLng([latitude, longitude]);
@@ -516,7 +396,7 @@
                 accuracyCircle.setRadius(accuracy);
             } else {
                 userMarker = L.marker([latitude, longitude]).addTo(map)
-                    .bindPopup(`<b>Your Location</b><br>${addressData.full.replace(/\n/g, '<br>')}`)
+                    .bindPopup('Your Location')
                     .openPopup();
                 
                 accuracyCircle = L.circle([latitude, longitude], {
@@ -526,13 +406,7 @@
                     fillOpacity: 0.2
                 }).addTo(map);
                 
-                // Zoom to location with appropriate zoom level based on accuracy
-                const zoomLevel = accuracy < 10 ? 19 : 
-                                 accuracy < 50 ? 18 : 
-                                 accuracy < 100 ? 17 : 
-                                 accuracy < 300 ? 16 : 15;
-                
-                map.setView([latitude, longitude], zoomLevel);
+                map.setView([latitude, longitude], 15);
             }
             
             // Add to history
@@ -540,7 +414,6 @@
                 latitude: latitude.toFixed(6),
                 longitude: longitude.toFixed(6),
                 accuracy: accuracy.toFixed(2),
-                address: addressData.full,
                 timestamp: timestamp
             });
             
@@ -583,7 +456,7 @@
             navigator.geolocation.getCurrentPosition(
                 (position) => {
                     updateLocationInfo(position);
-                    permissionStatusEl.textContent = 'Permission granted - Location detected';
+                    permissionStatusEl.textContent = 'Permission granted';
                     permissionStatusEl.style.color = '#4caf50';
                     showNotification('Location retrieved successfully!', 'success');
                 },
@@ -592,13 +465,13 @@
                 },
                 {
                     enableHighAccuracy: true,
-                    timeout: 15000,
+                    timeout: 10000,
                     maximumAge: 0
                 }
             );
         }
         
-        // Start watching position (auto-tracking)
+        // Start watching position
         function startTracking() {
             if (!navigator.geolocation) {
                 showNotification('Geolocation is not supported by your browser', 'error');
@@ -614,7 +487,7 @@
             trackingId = navigator.geolocation.watchPosition(
                 (position) => {
                     updateLocationInfo(position);
-                    trackingStatusEl.textContent = 'Auto-tracking active';
+                    trackingStatusEl.textContent = 'Tracking active';
                     trackingStatusEl.style.color = '#4caf50';
                     showNotification('Position updated', 'success');
                 },
@@ -623,7 +496,7 @@
                 },
                 {
                     enableHighAccuracy: true,
-                    timeout: 15000,
+                    timeout: 10000,
                     maximumAge: 0
                 }
             );
@@ -637,9 +510,9 @@
             if (trackingId) {
                 navigator.geolocation.clearWatch(trackingId);
                 trackingId = null;
-                trackingStatusEl.textContent = 'Tracking paused';
-                trackingStatusEl.style.color = '#ff9800';
-                showNotification('Tracking paused', 'info');
+                trackingStatusEl.textContent = 'Tracking stopped';
+                trackingStatusEl.style.color = '#f44336';
+                showNotification('Tracking stopped', 'info');
                 
                 startTrackingBtn.disabled = false;
                 stopTrackingBtn.disabled = true;
@@ -652,7 +525,7 @@
             
             switch(error.code) {
                 case error.PERMISSION_DENIED:
-                    errorMessage = "Location access denied. Please enable location services in your browser settings.";
+                    errorMessage = "User denied the request for Geolocation.";
                     permissionStatusEl.textContent = 'Permission denied';
                     permissionStatusEl.style.color = '#f44336';
                     break;
@@ -660,7 +533,7 @@
                     errorMessage = "Location information is unavailable.";
                     break;
                 case error.TIMEOUT:
-                    errorMessage = "The request to get your location timed out.";
+                    errorMessage = "The request to get user location timed out.";
                     break;
                 case error.UNKNOWN_ERROR:
                     errorMessage = "An unknown error occurred.";
@@ -668,49 +541,64 @@
             }
             
             showNotification(errorMessage, 'error');
-            addressDetailsEl.textContent = 'Unable to retrieve address due to location error';
         }
         
         // Event listeners
-        refreshBtn.addEventListener('click', getCurrentPosition);
+        getLocationBtn.addEventListener('click', getCurrentPosition);
         startTrackingBtn.addEventListener('click', startTracking);
         stopTrackingBtn.addEventListener('click', stopTracking);
         
-        // Check initial permission status and start tracking automatically
+        // Check initial permission status
         if (navigator.permissions) {
             navigator.permissions.query({name:'geolocation'}).then(function(result) {
                 if (result.state === 'granted') {
-                    permissionStatusEl.textContent = 'Permission already granted';
+                    permissionStatusEl.textContent = 'Permission granted';
                     permissionStatusEl.style.color = '#4caf50';
-                    startTracking(); // Start tracking immediately
                 } else if (result.state === 'denied') {
-                    permissionStatusEl.textContent = 'Permission denied - Location access blocked';
+                    permissionStatusEl.textContent = 'Permission denied';
                     permissionStatusEl.style.color = '#f44336';
-                    showNotification('Location access is blocked. Please enable it in browser settings.', 'error');
                 } else if (result.state === 'prompt') {
-                    permissionStatusEl.textContent = 'Requesting location permission...';
+                    permissionStatusEl.textContent = 'Prompt - permission not yet requested';
                     permissionStatusEl.style.color = '#ff9800';
-                    startTracking(); // Will prompt for permission
                 }
                 
                 result.onchange = function() {
                     if (result.state === 'granted') {
                         permissionStatusEl.textContent = 'Permission granted';
                         permissionStatusEl.style.color = '#4caf50';
-                        startTracking();
                     } else if (result.state === 'denied') {
                         permissionStatusEl.textContent = 'Permission denied';
                         permissionStatusEl.style.color = '#f44336';
                     }
                 };
             });
-        } else {
-            // Fallback for older browsers
-            startTracking();
         }
         
-        // Initialize with a world view
-        map.setView([0, 0], 2);
+        // Initialize with a demo location (Paris)
+        setTimeout(() => {
+            if (!userMarker) {
+                const demoLat = 48.8566;
+                const demoLng = 2.3522;
+                
+                userMarker = L.marker([demoLat, demoLng]).addTo(map)
+                    .bindPopup('Demo Location: Paris')
+                    .openPopup();
+                
+                accuracyCircle = L.circle([demoLat, demoLng], {
+                    radius: 50,
+                    color: '#3388ff',
+                    fillColor: '#3388ff',
+                    fillOpacity: 0.2
+                }).addTo(map);
+                
+                map.setView([demoLat, demoLng], 13);
+                
+                coordinatesEl.innerHTML = `Latitude: ${demoLat}<br>Longitude: ${demoLng}`;
+                accuracyEl.textContent = '50.00';
+                timestampEl.textContent = new Date().toLocaleString();
+                accuracyFillEl.style.width = '50%';
+            }
+        }, 1000);
     </script>
 </body>
 </html>
