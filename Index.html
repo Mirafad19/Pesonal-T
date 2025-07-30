@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Enhanced OpenStreetMap Geolocation</title>
+    <title>Real-Time Geolocation Tracker</title>
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
@@ -290,8 +290,8 @@
 <body>
     <div class="container">
         <header>
-            <h1><i class="fas fa-location-dot"></i> Enhanced OpenStreetMap Geolocation</h1>
-            <p class="subtitle">This demo uses the HTML5 Geolocation API with OpenStreetMap for precise location tracking and detailed address resolution - completely free!</p>
+            <h1><i class="fas fa-location-dot"></i> Real-Time Geolocation Tracker</h1>
+            <p class="subtitle">This tool automatically detects your location when you visit and shows your exact address on a detailed map.</p>
         </header>
         
         <div class="app-container">
@@ -300,12 +300,12 @@
             </div>
             
             <div class="info-panel">
-                <h2 class="panel-title">Location Information</h2>
+                <h2 class="panel-title">Your Location Information</h2>
                 
                 <div class="status-card">
                     <h3 class="status-title"><i class="fas fa-user-check"></i> Permission Status</h3>
                     <div class="status-content" id="permission-status">
-                        Not requested yet
+                        Checking permissions...
                     </div>
                 </div>
                 
@@ -329,7 +329,7 @@
                     <h3 class="status-title"><i class="fas fa-home"></i> Address Details</h3>
                     <div class="status-content">
                         <div class="address-details" id="address-details">
-                            Address will appear here after location is determined
+                            Waiting for location data...
                         </div>
                     </div>
                 </div>
@@ -337,19 +337,19 @@
                 <div class="status-card">
                     <h3 class="status-title"><i class="fas fa-tachometer-alt"></i> Tracking Status</h3>
                     <div class="status-content" id="tracking-status">
-                        Not tracking
+                        Auto-tracking active
                     </div>
                 </div>
                 
                 <div class="controls">
-                    <button id="get-location-btn">
-                        <i class="fas fa-location-crosshairs"></i> Get Location
+                    <button id="refresh-btn">
+                        <i class="fas fa-sync"></i> Refresh Location
                     </button>
-                    <button id="start-tracking-btn">
-                        <i class="fas fa-play"></i> Start Tracking
+                    <button id="start-tracking-btn" disabled>
+                        <i class="fas fa-play"></i> Resume Tracking
                     </button>
-                    <button id="stop-tracking-btn" disabled class="stop-btn">
-                        <i class="fas fa-stop"></i> Stop Tracking
+                    <button id="stop-tracking-btn">
+                        <i class="fas fa-stop"></i> Pause Tracking
                     </button>
                 </div>
                 
@@ -363,13 +363,13 @@
         </div>
         
         <footer>
-            <p>Enhanced OpenStreetMap Geolocation Demo using HTML5 Geolocation API | Created with ❤️</p>
+            <p>Real-Time Geolocation Tracker | Works completely free with no API costs</p>
         </footer>
     </div>
     
     <div class="notification" id="notification"></div>
     
-    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="✓"></script>
     <script>
         // Initialize map with enhanced configuration
         const map = L.map('map', {
@@ -378,7 +378,7 @@
             maxZoom: 20
         }).setView([0, 0], 2);
         
-        // Add multiple high-quality tile layers
+        // Add high-quality tile layers
         const osmLayer = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
             attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
             maxZoom: 19
@@ -415,7 +415,7 @@
         const accuracyEl = document.getElementById('accuracy');
         const timestampEl = document.getElementById('timestamp');
         const trackingStatusEl = document.getElementById('tracking-status');
-        const getLocationBtn = document.getElementById('get-location-btn');
+        const refreshBtn = document.getElementById('refresh-btn');
         const startTrackingBtn = document.getElementById('start-tracking-btn');
         const stopTrackingBtn = document.getElementById('stop-tracking-btn');
         const accuracyFillEl = document.getElementById('accuracy-fill');
@@ -583,7 +583,7 @@
             navigator.geolocation.getCurrentPosition(
                 (position) => {
                     updateLocationInfo(position);
-                    permissionStatusEl.textContent = 'Permission granted';
+                    permissionStatusEl.textContent = 'Permission granted - Location detected';
                     permissionStatusEl.style.color = '#4caf50';
                     showNotification('Location retrieved successfully!', 'success');
                 },
@@ -598,7 +598,7 @@
             );
         }
         
-        // Start watching position
+        // Start watching position (auto-tracking)
         function startTracking() {
             if (!navigator.geolocation) {
                 showNotification('Geolocation is not supported by your browser', 'error');
@@ -614,7 +614,7 @@
             trackingId = navigator.geolocation.watchPosition(
                 (position) => {
                     updateLocationInfo(position);
-                    trackingStatusEl.textContent = 'Tracking active';
+                    trackingStatusEl.textContent = 'Auto-tracking active';
                     trackingStatusEl.style.color = '#4caf50';
                     showNotification('Position updated', 'success');
                 },
@@ -637,9 +637,9 @@
             if (trackingId) {
                 navigator.geolocation.clearWatch(trackingId);
                 trackingId = null;
-                trackingStatusEl.textContent = 'Tracking stopped';
-                trackingStatusEl.style.color = '#f44336';
-                showNotification('Tracking stopped', 'info');
+                trackingStatusEl.textContent = 'Tracking paused';
+                trackingStatusEl.style.color = '#ff9800';
+                showNotification('Tracking paused', 'info');
                 
                 startTrackingBtn.disabled = false;
                 stopTrackingBtn.disabled = true;
@@ -652,7 +652,7 @@
             
             switch(error.code) {
                 case error.PERMISSION_DENIED:
-                    errorMessage = "User denied the request for Geolocation.";
+                    errorMessage = "Location access denied. Please enable location services in your browser settings.";
                     permissionStatusEl.textContent = 'Permission denied';
                     permissionStatusEl.style.color = '#f44336';
                     break;
@@ -660,7 +660,7 @@
                     errorMessage = "Location information is unavailable.";
                     break;
                 case error.TIMEOUT:
-                    errorMessage = "The request to get user location timed out.";
+                    errorMessage = "The request to get your location timed out.";
                     break;
                 case error.UNKNOWN_ERROR:
                     errorMessage = "An unknown error occurred.";
@@ -672,65 +672,45 @@
         }
         
         // Event listeners
-        getLocationBtn.addEventListener('click', getCurrentPosition);
+        refreshBtn.addEventListener('click', getCurrentPosition);
         startTrackingBtn.addEventListener('click', startTracking);
         stopTrackingBtn.addEventListener('click', stopTracking);
         
-        // Check initial permission status
+        // Check initial permission status and start tracking automatically
         if (navigator.permissions) {
             navigator.permissions.query({name:'geolocation'}).then(function(result) {
                 if (result.state === 'granted') {
-                    permissionStatusEl.textContent = 'Permission granted';
+                    permissionStatusEl.textContent = 'Permission already granted';
                     permissionStatusEl.style.color = '#4caf50';
+                    startTracking(); // Start tracking immediately
                 } else if (result.state === 'denied') {
-                    permissionStatusEl.textContent = 'Permission denied';
+                    permissionStatusEl.textContent = 'Permission denied - Location access blocked';
                     permissionStatusEl.style.color = '#f44336';
+                    showNotification('Location access is blocked. Please enable it in browser settings.', 'error');
                 } else if (result.state === 'prompt') {
-                    permissionStatusEl.textContent = 'Prompt - permission not yet requested';
+                    permissionStatusEl.textContent = 'Requesting location permission...';
                     permissionStatusEl.style.color = '#ff9800';
+                    startTracking(); // Will prompt for permission
                 }
                 
                 result.onchange = function() {
                     if (result.state === 'granted') {
                         permissionStatusEl.textContent = 'Permission granted';
                         permissionStatusEl.style.color = '#4caf50';
+                        startTracking();
                     } else if (result.state === 'denied') {
                         permissionStatusEl.textContent = 'Permission denied';
                         permissionStatusEl.style.color = '#f44336';
                     }
                 };
             });
+        } else {
+            // Fallback for older browsers
+            startTracking();
         }
         
-        // Initialize with a detailed demo location (Eiffel Tower, Paris)
-        setTimeout(() => {
-            if (!userMarker) {
-                const demoLat = 48.8584;
-                const demoLng = 2.2945;
-                
-                // Get demo address
-                getAddressFromCoordinates(demoLat, demoLng).then(addressData => {
-                    userMarker = L.marker([demoLat, demoLng]).addTo(map)
-                        .bindPopup(`<b>Demo Location</b><br>${addressData.full.replace(/\n/g, '<br>')}`)
-                        .openPopup();
-                    
-                    accuracyCircle = L.circle([demoLat, demoLng], {
-                        radius: 30,
-                        color: '#3388ff',
-                        fillColor: '#3388ff',
-                        fillOpacity: 0.2
-                    }).addTo(map);
-                    
-                    map.setView([demoLat, demoLng], 18);
-                    
-                    coordinatesEl.innerHTML = `Latitude: ${demoLat}<br>Longitude: ${demoLng}`;
-                    accuracyEl.textContent = '30.00';
-                    timestampEl.textContent = new Date().toLocaleString();
-                    accuracyFillEl.style.width = '70%';
-                    addressDetailsEl.textContent = addressData.full;
-                });
-            }
-        }, 1000);
+        // Initialize with a world view
+        map.setView([0, 0], 2);
     </script>
 </body>
 </html>
